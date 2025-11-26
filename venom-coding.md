@@ -1,17 +1,3 @@
----
-title: "MRes_BLS_adders_workflow"
-author: "Alex"
-date: "2025-11-07"
-output:
-  html_document: default
-  pdf_document: default
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE, echo = TRUE)
-
-```
-
 # Workflow of the role of BLS in venom coding regions of the common adder
 All steps done to generate final thesis should be documented in detail here
 
@@ -673,6 +659,7 @@ abline(h = mean(nucdiv_1kb$Tajima, na.rm = TRUE), col = "red", lty = 2)
 dev.off()
 
 ```
+
 
 
 
