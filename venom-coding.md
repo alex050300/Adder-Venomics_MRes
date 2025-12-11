@@ -1,10 +1,12 @@
+
 # Workflow of the role of BLS in venom coding regions of the common adder
-All steps done to generate final thesis should be documented in detail here
+All steps done to generate final thesis should be documented in detail here.The goal is to find evidence for both long term and recent balancing selection and if inbreeding has a negative effect on populations capability to maintain their venom geno-/phenotype diversity through balancing selection
 
 
 ## Step 1: Annotating the venom coding regions
 First step of the project is to locate (annotate) the venom coding regions of vipera berus. To be able to test for types of selection, we need to decide at what genome regions we want to look. 
-To achieve this, literature was compared. As we do not have a venom gland transcriptome, we cannot us such cds to find our venom genes in the genome. we do have a high quality sanger sequences reference genome and found the ToxCodAn Pipeline to annotate venom genes without using a custom cds derived from a transcriptome, using a generally available viperidae toxing database, compiled by the same authors.
+To achieve this, literature was compared. As we do not have a venom gland transcriptome, we cannot use such cds to find our venom genes in the genome. we do have a high quality sanger sequence reference genome and found the ToxCodAn Pipeline to annotate venom genes without using a custom cds derived from a transcriptome, using a generally available viperidae toxing database, compiled by the same authors.
+the example presented is on the 2nd haplotype of the vipera berus reference individual.
 
 The following script had the following prerequesits to be installed in this case on my local machine:
 - python, biopython and pandas
@@ -14,38 +16,34 @@ The following script had the following prerequesits to be installed in this case
 - GffRead
 - R
 
-run ToxCodAn, i made a conda environment on my local machine, which i would activate before being able to run toxcodan:
-```{bash}
- /home/alexn/Annotating/ToxCodAn-Genome/bin/toxcodan-genome.py -g /home/alexn/Annotating/ragtag_najaS2-najaS1.fasta -d /home/alexn/Annotating/Elapidae_db.fasta -c 6
-```
-
-
-to make tsv file for visualisation form gtf:
-```{bash}
-python ToxCodAn-Genome/bin/fromCDStoGENE.py   ToxCodAnGenome_outputNanaS1/toxin_annotation.gtf   ToxC
-odAnGenome_outputNanaS1/toxin_annotation_GENE_NajaS1.tsv
-```
-
-use r in bash to make nice little plot:
-```{bash}
-Rscript ToxCodAn-Genome/b
-in/PlotToxinLoci.R   -i ToxCodAnGenome_outputNanaS1/toxin_annotation_GENE_Na
-jaS1.tsv   -o output
-```
-
-
 Viperidae Database used:
 ```{bash}
 wget https://raw.githubusercontent.com/pedronachtigall/ToxCodAn-Genome/main/Databases/Viperidae_db.fasta
 ```
-
 Reference Genome used:
 ```{bash}
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/964/194/415/GCA_964194415.1_rVipBer3.hap1.1/GCA_964194415.1_rVipBer3.hap1.1_genomic.fna.gz 
 ```
 
 
-continue workflow for annotation of venom genes
+run ToxCodAn, i made a conda environment on my local machine, which i would activate before being able to run toxcodan:
+```{bash}
+ /home/alexn/Annotating/ToxCodAn-Genome/bin/toxcodan-genome.py -g /home/alexn/Annotating/ber_hap2.fna -d /home/alexn/Annotating/Viperidae_db.fasta -c 6
+```
+
+
+to make tsv file for visualisation from gtf:
+```{bash}
+python ToxCodAn-Genome/bin/fromCDStoGENE.py   ToxCodAnGenome_output_ber_hap2/toxin_annotation.gtf   ToxC
+odAnGenome_output_ber_hap2/toxin_annotation_GENE_ber_hap2.tsv
+```
+
+use r in bash to make nice little plot:
+```{bash}
+Rscript ToxCodAn-Genome/bin/PlotToxinLoci.R   -i ToxCodAnGenome_output_ber_hap2/toxin_annotation_GENE_ber_hap2.tsv   -o output
+```
+
+Next step is to check these annotations, both manually and blasting them against other resources.
 
 
 
@@ -56,7 +54,7 @@ continue workflow for annotation of venom genes
 
 bamlists used:
 ```{bash}
-#bamlists of 10 individuals of a valley population in snowdonia (sno) and 10 from a population in angelesy (ang) and 10 from nitidale
+#bamlists of 10 individuals of a valley population in snowdonia (sno) and 10 from a population in angelesy (ang) and 10 from nidderdale
 
 #pop1(sno)
 /scratch/scw2119/BEARCAVE2/mappedrVipBer3/zob+ww5350_ber_rVipBer3_22.05937.bam   #ww5350
@@ -82,7 +80,7 @@ scratch/scw2119/BEARCAVE2/mappedrVipBer3/xob+ww5355_ber_rVipBer3_1.79212.bam  #w
 scratch/scw2119/BEARCAVE2/mappedrVipBer3/80q+ww5360_ber_rVipBer3_13.37310.bam  #ww5360
 scratch/scw2119/BEARCAVE2/mappedrVipBer3/nzh+ww5354_ber_rVipBer3_12.34350.bam  #ww5354
 
-#pop3 nit
+#pop3 nid
 /scratch/scw2415/BEARCAVE2/mappedrVipBer3/00v_fsL+ww6336_ber_rVipBer3_13.94015.bam
 /scratch/scw2415/BEARCAVE2/mappedrVipBer3/1ub_sou+ww6315_ber_rVipBer3_14.71187.bam
 /scratch/scw2415/BEARCAVE2/mappedrVipBer3/3v3_p16+ww6340_ber_rVipBer3_13.50006.bam
@@ -96,61 +94,7 @@ scratch/scw2119/BEARCAVE2/mappedrVipBer3/nzh+ww5354_ber_rVipBer3_12.34350.bam  #
 ```
 
 
-To calculate fst for sliding windows, i made a unfolded 2dsfs and made indexes and eventually slidingwindows of them, more information in the code, this can be adjusted by simply changing folder and chromosome names to use fo rother chromosomes, I decided to use this workflow once i was happy with all my individual output (i have not run docounts yet, doing that now):
-```{bash}
-#!/bin/bash --login
-#SBATCH --job-name=fst_sno_ang_chr8
-#SBATCH --output=/scratch/b.lxn25yng/slurmscripts/logs/fst_ang_%J.out
-#job stderr file
-#SBATCH --error=/scratch/b.lxn25yng/slurmscripts/logs/fst_ang_%J.err
-#SBATCH --partition=htc
-#SBATCH --time=0-1:00
-#SBATCH --nodes=1
-#SBATCH --ntasks=10
-#SBATCH --mem=20G
-#SBATCH --account=scw2119
-#SBATCH --chdir=/scratch/b.lxn25yng/slurmscripts/
-
-#load modules used by the script 
-module purge
-module load angsd/0.935
-
-# pop bamlists
-bamlistp1='/scratch/b.lxn25yng/bamlists/bamplistp1.txt' # pop1 bamlist in my case 10 individuals from snowdonia
-bamlistp2='/scratch/b.lxn25yng/bamlists/bamplistp2.txt' # pop2 bamlist, 10 individuals from angelesy
-
-
-# set outgroup reference to have information on ancestral gene state. 
-anc='/scratch/scw2119/outgroups/ursinii_mapped_berus/9vi+L41_urs_rVipBer3.fa'
-
-# Calculate site allele frequencies (per pop saf for each population). Using the to Vipera berus mapped ursinnii fasta file as an outgroup, this gives us information on the ancestral gene.
-angsd -b $bamlistp1 -doSaf 1 -doMaf 1 -GL 1 -r "chr_8" -P 10 -doMajorMinor 1 -anc $anc -out /scratch/b.lxn25yng/Vber/fst/chr8/pop1 -minMapQ 30 -minQ 30 -minIndDepth 4 
-
-angsd -b $bamlistp2 -doSaf 1 -doMaf 1 -GL 1 -r "chr_8" -P 10 -doMajorMinor 1 -anc $anc -out /scratch/b.lxn25yng/Vber/fst/chr8/pop2 -minMapQ 30 -minQ 30 -minIndDepth 4 
-
-
-# saf lists 
-saf_pop1='/scratch/b.lxn25yng/Vber/fst/chr8/pop1.saf.idx' 
-saf_pop2='/scratch/b.lxn25yng/Vber/fst/chr8/pop2.saf.idx' 
-
-#Calculate the 2dsfs
-realSFS $saf_pop1 $saf_pop2 -P 10 -seed 45 > /scratch/b.lxn25yng/Vber/fst/chr8/fst.sfs
-
-#make an fst index file for reach chromososme
-realSFS fst index /scratch/b.lxn25yng/Vber/fst/chr8/pop1.saf.idx /scratch/b.lxn25yng/Vber/fst/chr8/pop2.saf.idx \
-  -sfs /scratch/b.lxn25yng/Vber/fst/chr8/fst.sfs \
-  -fstout /scratch/b.lxn25yng/Vber/fst/chr8/fst_ind -whichFST 1
-
-#now we can make our sliding window file, just adjust window size, output file doesent have fst in header, i added this manually for my R script to work
-realSFS fst stats2 /scratch/b.lxn25yng/Vber/fst/chr8/fst_ind.fst.idx -win 50000 -step 50000 -whichFST 1 \
-  > /scratch/b.lxn25yng/Vber/fst/chr8/chr8.fst.50kb.win.txt
-
-realSFS fst stats2 /scratch/b.lxn25yng/Vber/fst/chr8/fst_ind.fst.idx -win 10000 -step 10000 -whichFST 1 \
-  > /scratch/b.lxn25yng/Vber/fst/chr8/chr8.fst.10kb.win.txt
-
-```
-
-3dsfs: 
+To calculate fst for sliding windows, i made a unfolded 2dsfs and made indexes and eventually slidingwindows of them, more information in the code, this can be adjusted by simply changing folder and chromosome names to use fo rother chromosomes, I decided to use this workflow once i was happy with all my individual output (i tried to run it with do counts and depth filters, but i would get error messages that these failed if i didnt apply docounts and if i did the results would be the same):
 ```{bash}
 #!/bin/bash --login
 #SBATCH --job-name=fst_$chrn
@@ -234,103 +178,26 @@ realSFS fst stats2 /scratch/b.lxn25yng/Vber/fst/$chrn/fst_ind23.fst.idx -win $wi
   > /scratch/b.lxn25yng/Vber/fst/$chrn/$chrn.pop23.fst.1kb.win.txt
 
 
+
 ```
 
 
 
-Rstudio script to get sliding windows including orange marker for venom coding regions and zoom in:
+Rstudio script to get sliding windows including blue marker for venom coding regions and zoom in:
 ```{r}
 
 setwd("C:/Users/alexn/OneDrive/Desktop/R")
 
-pdf("fst_chr17.pdf", width=8, height=6)
-
-par(mfrow = c(2, 1), mar = c(4, 4, 2, 1))  # adjust margins if needed
-
-# Load and clean data properly
-fst <- read.table("chr17.fst.50kb.win.txt",
-                  header = TRUE,
-                  sep = "\t",
-                  fill = TRUE,
-                  quote = "",
-                  stringsAsFactors = FALSE,
-                  comment.char = "")
-
-# Convert to megabases
-fst$midPosMb <- fst$midPos / 1e6
-
-# Plot FST along chromosome 8
-plot(fst$midPosMb, fst$fst,
-     type = "l",
-     col = "steelblue",
-     lwd = 2,
-     main = "FST along PLA2 genome region",
-     xlab = "Position (Mb)",
-     ylab = "FST",
-     #xlim = c(15.5, 17.5),
-     ylim = c(-0.05, 1))
-
-# Add shaded region (for SVMP and SVSP 50kb up and downstream from first and last coding gene, for pla2 10kb)
-rect(xleft = 0.217905, xright = 0.265518,
-     ybottom = -0.1, ytop = 1.1,       # vertical range slightly beyond plot
-     col = adjustcolor("orange", alpha.f = 0.3), # transparent orange fill
-     border = NA)                      # no border line
-
-# Add mean FST line
-abline(h = mean(fst$fst, na.rm = TRUE), col = "red", lty = 2)
-
-
-# Load and clean data, important i used 1kb sliding windows for chr17 as pla2 genes are small. i used 10kb windows for other chromosomes.
-fst <- read.table("chr17.fst.1kb.win.txt",
-                  header = TRUE,
-                  sep = "\t",
-                  fill = TRUE,
-                  quote = "",
-                  stringsAsFactors = FALSE,
-                  comment.char = "")
-
-
-# Convert to megabases
-fst$midPosMb <- fst$midPos / 1e6
-
-# Plot FST along chromosome 8
-plot(fst$midPosMb, fst$fst,
-     type = "l",
-     col = "steelblue",
-     lwd = 2,
-     main = "FST along PLA2 genome region",
-     xlab = "Position (Mb)",
-     ylab = "FST",
-     xlim = c(0.2, 0.3),
-     ylim = c(-0.05, 1))
-
-# Add shaded region (for SVMP and SVSP 50kb up and downstream from first and last coding gene, for pla2 10kb)
-rect(xleft = 0.217905, xright = 0.265518,     #16.136741, xright = 16.703980,   7.712179, xright = 7.943062, 0.217905, xright = 0.274518  rectangle to highlight genome region
-     ybottom = -0.1, ytop = 1.1,       # vertical range slightly beyond plot
-     col = adjustcolor("orange", alpha.f = 0.3), # transparent orange fill
-     border = NA)                      # no border line
-
-# Add mean FST line
-abline(h = mean(fst$fst, na.rm = TRUE), col = "red", lty = 2)
-
-dev.off()
-
-```
-
-r script for 3d sliding window, in this case the complicated way of making seperate pairwise slidingwindows
-```{r}
-setwd("C:/Users/alexn/OneDrive/Desktop/R")
-
-chr <- "chr9"
-gene = "SVSP"
+chr <- "chr8"
+gene = "SVMP"
 win1 <- 50
 win2 <- 10
-recstart <- 7.712179   #16.136741, xright = 16.703980,   7.712179, xright = 7.943062, 0.217905, xright = 0.274518  rectangle to highlight
-recend <- 7.943062
-xstart <- 7
-xend <- 8
+recstart <- 16.136741   #16.136741, xright = 16.703980,   7.712179, xright = 7.943062, 0.217905, xright = 0.274518  rectangle to highlight
+recend <-  16.703980
+xstart <- 16
+xend <- 17
 
-pdf("fst_chr9_allpops.pdf", width = 8, height = 6)
+pdf("fst_chr8_allpops.pdf", width = 8, height = 6)
 par(mfrow = c(2,1), mar = c(4, 4, 2, 1))  # single plot
 
 fst_files <- c(
@@ -339,10 +206,7 @@ fst_files <- c(
   paste0(chr, ".pop23.fst.", win1, "kb.win.txt")
 )
 
-# List of your three FST files for chromosome 8, 50kb windows
-#fst_files <- c("chr.pop12.fst.win1kb.win.txt",
-               #"chr.pop13.fst.win1kb.win.txt",
-               #"chr.pop23.fst.win1kb.win.txt")
+
 
 # Colors for the three populations
 pop_colors <- c("steelblue", "darkgreen", "purple")
@@ -364,7 +228,7 @@ plot(fst1$midPosMb, fst1$fst,
      ylab = "FST",
      #xlim = range(fst1$midPosMb),
      ylim = c(-0.05, 1),
-     main = "FST along SVSP genome region")
+     main = "FST along SVMP genome region")
 
 #Add shaded rectangle
 rect(xleft = recstart ,xright = recend,
@@ -395,8 +259,8 @@ fst_files <- c(
 
 # List of your three FST files for chromosome 8, 50kb windows
 #fst_files <- c("chr.pop12.fst.win2kb.win.txt",
-               #"chr.pop13.fst.win2kb.win.txt",
-              # "chr.pop23.fst.win2kb.win.txt")
+#"chr.pop13.fst.win2kb.win.txt",
+# "chr.pop23.fst.win2kb.win.txt")
 
 # Colors for the three populations
 pop_colors <- c("steelblue", "darkgreen", "purple")
@@ -417,7 +281,7 @@ plot(fst1$midPosMb, fst1$fst,
      ylab = "FST",
      xlim = range(xstart, xend),
      ylim = c(-0.05, 1),
-     main = "FST along SVSP genome region")
+     main = "FST along SVMP genome region")
 
 # Add shaded rectangle
 rect(xleft = recstart, xright = recend,
@@ -440,15 +304,12 @@ for(i in 1:length(fst_files)) {
 legend("topright", legend = pop_names, col = pop_colors, lty = 1, lwd = 2)
 
 dev.off()
-
-
 ```
 
+![FST plot](plots/fst_chr8_allpops.png)
 
 
-
-
-full script fo rnucleotide diversity for each population per chromososme, and it actually  worked rather quickly, what a rush. again used 1kb windows for smaller genome regions and 10kb for larger
+full script for nucleotide diversity for each population per chromososme, and it actually  worked rather quickly, what a rush. again used 1kb windows for smaller genome regions and 10kb for larger
 
 ```{bash}
 #!/bin/bash --login
@@ -491,92 +352,132 @@ thetaStat do_stat /scratch/b.lxn25yng/Vber/ncd/pop1/$chrn/pop1_$chrn.thetas.idx 
 thetaStat do_stat /scratch/b.lxn25yng/Vber/ncd/pop2/$chrn/pop2_$chrn.thetas.idx -win $win1 -step $win1 -outnames /scratch/b.lxn25yng/Vber/ncd/pop2/$chrn/pop2_$chrn.50kb.thetas.txt
 thetaStat do_stat /scratch/b.lxn25yng/Vber/ncd/pop2/$chrn/pop2_$chrn.thetas.idx -win $win2 -step $win2 -outnames /scratch/b.lxn25yng/Vber/ncd/pop2/$chrn/pop2_$chrn.10kb.thetas.txt
 
-
 thetaStat do_stat /scratch/b.lxn25yng/Vber/ncd/pop3/$chrn/pop3_$chrn.thetas.idx -win $win1 -step $win1 -outnames /scratch/b.lxn25yng/Vber/ncd/pop3/$chrn/pop3_$chrn.50kb.thetas.txt
 thetaStat do_stat /scratch/b.lxn25yng/Vber/ncd/pop3/$chrn/pop3_$chrn.thetas.idx -win $win2 -step $win2 -outnames /scratch/b.lxn25yng/Vber/ncd/pop3/$chrn/pop3_$chrn.10kb.thetas.txt
+
 
 ```
 
 
 
 ```{r}
-# Set working directory
 setwd("C:/Users/alexn/OneDrive/Desktop/R")
 
-# Open PDF for plotting
-pdf("nucdiv_chr9_pop2.pdf", width = 8, height = 6)
-par(mfrow = c(2, 1), mar = c(4, 4, 2, 1))  # 2 rows, 1 column
 
-# -------------------------------
-# Load 50 kb window data
-nucdiv_50kb <- read.table("pop2_chr9.50kb.thetas.txt.pestPG",
-                          header = TRUE,
-                          sep = "\t",
-                          fill = TRUE,
-                          quote = "",
-                          stringsAsFactors = FALSE,
-                          comment.char = "")
+chr <- "chr17"
+gene = "PLA2"
+win1 <- 50
+win2 <- 10
+recstart <- 0.217905   #16.136741, xright = 16.703980,   7.712179, xright = 7.943062, 0.217905, xright = 0.274518  rectangle to highlight
+recend <- 0.274518
+xstart <- 0.2
+xend <- 0.3
 
 
+#dont forget to chang the f******* name of the chromososme beacau i was to olazy t oinput the object here
+pdf("ncd_chr17_allpops.pdf", width = 8, height = 6)
+par(mfrow = c(2,1), mar = c(4, 4, 2, 1))  # single plot
 
-# Convert positions to Mb
-nucdiv_50kb$midMb <- nucdiv_50kb$WinCenter / 1e6
+pi_files_50 <- c(
+  paste0("pop1_", chr, ".", win1, "kb.thetas.txt.pestPG"),
+  paste0("pop2_", chr, ".", win1, "kb.thetas.txt.pestPG"),
+  paste0("pop3_", chr, ".", win1, "kb.thetas.txt.pestPG")
+)
 
-# Plot nucleotide diversity
-plot(nucdiv_50kb$midMb, nucdiv_50kb$tP,
-     type = "l",
-     col = "darkgreen",
-     lwd = 2,
-     main = "Nucleotide diversity (π) chr9",
+
+
+# Colors for the three populations
+pop_colors <- c("#1f77b4", "#ff7f0e", "#2ca02c") 
+
+# Names for legend
+pop_names <- c("sno", "ang", "nit")
+
+
+### Read first pop to initialize plotting range
+d1 <- read.table(pi_files_50[1], header = TRUE)
+d1$midMb <- d1$WinCenter / 1e6
+
+
+plot(d1$midMb, d1$tP,
+     type = "n",
      xlab = "Position (Mb)",
      ylab = expression(pi),
-     ylim = c(0, 400))
-
-rect(xleft = 7.712179, xright = 7.943062,  #16.136741, xright = 16.703980,   7.712179, xright = 7.943062, 0.217905, xright = 0.274518  rectangle to highlight genome region
-     ybottom = -25, ytop = 500,       # vertical range slightly beyond plot
-     col = adjustcolor("orange", alpha.f = 0.3), # transparent orange fill
-     border = NA)                      # no border line
-
-# Add mean π line
-abline(h = mean(nucdiv_50kb$tP, na.rm = TRUE), col = "red", lty = 2)
-
-# -------------------------------
-# Load 10 kb window data
-nucdiv_10kb <- read.table("pop2_chr9.10kb.thetas.txt.pestPG",
-                         header = TRUE,
-                         sep = "\t",
-                         fill = TRUE,
-                         quote = "",
-                         stringsAsFactors = FALSE,
-                         comment.char = "")
+     ylim = c(0, 700),
+     main = bquote(pi ~ . (gene) * " genome region")
+)
 
 
-# Convert positions to Mb
-nucdiv_10kb$midMb <- nucdiv_10kb$WinCenter / 1e6
+rect(xleft = recstart, xright = recend,
+     ybottom = -1e6,
+     ytop = 1e6,
+     col = adjustcolor("orange", alpha.f = 0.3),
+     border = NA)
 
-# Plot nucleotide diversity
-plot(nucdiv_10kb$midMb, nucdiv_10kb$tP,
-     type = "l",
-     col = "darkgreen",
-     lwd = 1.5,
-     main = "Nucleotide diversity (π) chr9",
+### Add π curves for all 3 pops
+for(i in 1:3) {
+  
+  df <- read.table(pi_files_50[i], header = TRUE)
+  df$midMb <- df$WinCenter / 1e6
+  
+  # FIXED: plotting π (tP), not fst
+  lines(df$midMb, df$tP, col = pop_colors[i], lwd = 2)
+  
+  # Optional: mean π line
+  abline(h = mean(df$tP, na.rm = TRUE),
+         col = pop_colors[i], lty = 2)
+}
+
+legend("topright", legend = pop_names, col = pop_colors, lty = 1, lwd = 2)
+
+###zoomed window
+
+pi_files_10 <- c(
+  paste0("pop1_", chr, ".", win2, "kb.thetas.txt.pestPG"),
+  paste0("pop2_", chr, ".", win2, "kb.thetas.txt.pestPG"),
+  paste0("pop3_", chr, ".", win2, "kb.thetas.txt.pestPG")
+)
+
+
+
+# Colors for the three populations
+pop_colors <- c("#1f77b4", "#ff7f0e", "#2ca02c") 
+
+# Names for legend
+pop_names <- c("sno", "ang", "nit")
+
+
+### Zoom plot
+plot(d1$midMb, d1$tP,
+     type = "n",
      xlab = "Position (Mb)",
-     xlim = c(7.2, 8.2),
      ylab = expression(pi),
-     ylim = c(0, 100))
+     xlim = c(xstart, xend),
+     ylim = c(0, 50),
+     main = bquote(pi ~ . (gene) * " genome region")
+     )
 
-rect(xleft = 7.712179, xright = 7.943062,
-     ybottom = -10, ytop = 500,       # vertical range slightly beyond plot
-     col = adjustcolor("orange", alpha.f = 0.3), # transparent orange fill
-     border = NA)                      # no border line
+# Add shaded region
+rect(xleft = recstart, xright = recend,
+     ybottom = -1e6,
+     ytop = 1e6,
+     col = adjustcolor("orange", alpha.f = 0.3),
+     border = NA)
 
+### Add π curves
+for(i in 1:3) {
+  
+  df <- read.table(pi_files_10[i], header = TRUE)
+  df$midMb <- df$WinCenter / 1e6
+  
+  lines(df$midMb, df$tP, col = pop_colors[i], lwd = 2)
+  
+  abline(h = mean(df$tP, na.rm = TRUE),
+         col = pop_colors[i], lty = 2)
+}
 
-# Add mean π line
-abline(h = mean(nucdiv_10kb$tP, na.rm = TRUE), col = "red", lty = 2)
+legend("topright", legend = pop_names, col = pop_colors, lty = 1, lwd = 2)
 
-# Close PDF
 dev.off()
-
 ```
 
 R script to get tajimas D, the value is in the nucleotide div file:
@@ -659,7 +560,6 @@ abline(h = mean(nucdiv_1kb$Tajima, na.rm = TRUE), col = "red", lty = 2)
 dev.off()
 
 ```
-
 
 
 
